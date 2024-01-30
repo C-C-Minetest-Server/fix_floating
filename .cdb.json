@@ -2,7 +2,7 @@
     "type": "MOD",
     "dev_state": "ACTIVELY_DEVELOPED",
     "tags": [
-        "mapgen"   
+        "mapgen"
     ],
     "license": "LGPL-2.1-or-later",
     "media_license": "LGPL-2.1-or-later",

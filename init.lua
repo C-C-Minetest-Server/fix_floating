@@ -34,7 +34,6 @@ end
 
 minetest.register_on_generated(function(minp, maxp, blockseed)
     local vm, vminp, vmaxp = minetest.get_mapgen_object("voxelmanip")
-    local va = VoxelArea(vminp, vmaxp)
 
     -- Load at least one block below
     do
@@ -45,6 +44,7 @@ minetest.register_on_generated(function(minp, maxp, blockseed)
     end
 
     do
+        local va = VoxelArea(vminp, vmaxp)
         local data = vm:get_data()
 
         -- Iterate through generated blocks
