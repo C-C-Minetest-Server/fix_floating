@@ -32,6 +32,10 @@ if minetest.get_modpath("default") then
     fix_floating.list_nodes[ID("default:gravel")] = ID("default:stone")
 end
 
+if minetest.get_modpath("ethereal") then
+    fix_floating.list_nodes[ID("ethereal:sandy")] = ID("default:sandstone")
+end
+
 minetest.register_on_generated(function(minp, maxp, blockseed)
     local vm, vminp, vmaxp = minetest.get_mapgen_object("voxelmanip")
 

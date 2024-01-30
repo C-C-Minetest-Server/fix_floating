@@ -1,6 +1,6 @@
 # Fixing floating sands
 
-This mod enhances map generation; it replaces any falling blocks above air into their solid form. Currently, Minetest Game is supported. Other mods could register their list of falling nodes by adding entries into the `fix_floating.list_nodes` table.
+This mod enhances map generation; it replaces any falling blocks above air into their solid form. Currently, Minetest Game and Ethereal mod is supported. Other mods could register their list of falling nodes by adding entries into the `fix_floating.list_nodes` table.
 
 Now, no sand nor gravel would fall upon contact; but this raises another question; what keeps the sandstones in place? The 9.81 meters per second gravity due to Earth is being ignored...
 
