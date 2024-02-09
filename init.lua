@@ -36,6 +36,9 @@ if minetest.get_modpath("ethereal") then
     fix_floating.list_nodes[ID("ethereal:sandy")] = ID("default:sandstone")
 end
 
+-- https://dev.minetest.net/Mapgen_memory_optimisations
+local data = {}
+
 minetest.register_on_generated(function(minp, maxp, blockseed)
     local vm, vminp, vmaxp = minetest.get_mapgen_object("voxelmanip")
 
@@ -47,24 +50,22 @@ minetest.register_on_generated(function(minp, maxp, blockseed)
         vminp, vmaxp = vm:read_from_map(nminp, nmaxp)
     end
 
-    do
-        local va = VoxelArea(vminp, vmaxp)
-        local data = vm:get_data()
+    local va = VoxelArea(vminp, vmaxp)
+    vm:get_data(data)
 
-        -- Iterate through generated blocks
-        for i in va:iterp(minp, maxp) do
-            local below = va:indexp(vector.subtract(va:position(i), {x=0, y=1, z=0}))
+    -- Iterate through generated blocks
+    for i in va:iterp(minp, maxp) do
+        local below = va:indexp(vector.subtract(va:position(i), {x=0, y=1, z=0}))
 
-            if data[below] == minetest.CONTENT_AIR then
-                local targ = fix_floating.list_nodes[data[i]]
-                if targ then
-                    data[i] = targ
-                end
+        if data[below] == minetest.CONTENT_AIR then
+            local targ = fix_floating.list_nodes[data[i]]
+            if targ then
+                data[i] = targ
             end
         end
-
-        vm:set_data(data)
     end
+
+    vm:set_data(data)
 
     vm:write_to_map(true)
 end)
