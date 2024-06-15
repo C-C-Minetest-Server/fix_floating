@@ -19,33 +19,35 @@
     USA
 ]]
 
-fix_floating = {
-    list_nodes = {}
-}
+local get_mapgen_object = minetest.get_mapgen_object
+local VoxelArea = VoxelArea
 
 local ID = minetest.get_content_id
+local list_nodes = {}
 
 if minetest.get_modpath("default") then
-    fix_floating.list_nodes[ID("default:sand")] = ID("default:sandstone")
-    fix_floating.list_nodes[ID("default:silver_sand")] = ID("default:silver_sandstone")
-    fix_floating.list_nodes[ID("default:desert_sand")] = ID("default:desert_sandstone")
-    fix_floating.list_nodes[ID("default:gravel")] = ID("default:stone")
+    list_nodes[ID("default:sand")] = ID("default:sandstone")
+    list_nodes[ID("default:silver_sand")] = ID("default:silver_sandstone")
+    list_nodes[ID("default:desert_sand")] = ID("default:desert_sandstone")
+    list_nodes[ID("default:gravel")] = ID("default:stone")
 end
 
 if minetest.get_modpath("ethereal") then
-    fix_floating.list_nodes[ID("ethereal:sandy")] = ID("default:sandstone")
+    list_nodes[ID("ethereal:sandy")] = ID("default:sandstone")
 end
 
 -- https://dev.minetest.net/Mapgen_memory_optimisations
 local data = {}
 
+local CONTENT_AIR = minetest.CONTENT_AIR
 minetest.register_on_generated(function(minp, maxp, blockseed)
-    local vm, vminp, vmaxp = minetest.get_mapgen_object("voxelmanip")
+    local vm = get_mapgen_object("voxelmanip")
+    local vminp, vmaxp
 
     -- Load at least one block below
     do
-        local nminp = vector.new(minp.x, minp.y - 1, minp.z)
-        local nmaxp = vector.new(maxp.x, minp.y - 1, maxp.z)
+        local nminp = { x = minp.x, y = minp.y - 1, z = minp.z }
+        local nmaxp = { x = maxp.x, y = minp.y - 1, z = maxp.z }
 
         vminp, vmaxp = vm:read_from_map(nminp, nmaxp)
     end
@@ -55,10 +57,12 @@ minetest.register_on_generated(function(minp, maxp, blockseed)
 
     -- Iterate through generated blocks
     for i in va:iterp(minp, maxp) do
-        local below = va:indexp(vector.subtract(va:position(i), {x=0, y=1, z=0}))
+        local pos = va:position(i)
+        pos.y = pos.y - 1
+        local below = va:indexp(pos)
 
-        if data[below] == minetest.CONTENT_AIR then
-            local targ = fix_floating.list_nodes[data[i]]
+        if data[below] == CONTENT_AIR then
+            local targ = list_nodes[data[i]]
             if targ then
                 data[i] = targ
             end
@@ -70,3 +74,6 @@ minetest.register_on_generated(function(minp, maxp, blockseed)
     vm:write_to_map(true)
 end)
 
+fix_floating = {
+    list_nodes = list_nodes
+}
