@@ -19,61 +19,21 @@
     USA
 ]]
 
-local get_mapgen_object = minetest.get_mapgen_object
-local VoxelArea = VoxelArea
-
-local ID = minetest.get_content_id
-local list_nodes = {}
+local function set_falling_replace(nodename, replacename)
+    minetest.override_item(nodename, {
+        _falling_replace = replacename
+    })
+end
 
 if minetest.get_modpath("default") then
-    list_nodes[ID("default:sand")] = ID("default:sandstone")
-    list_nodes[ID("default:silver_sand")] = ID("default:silver_sandstone")
-    list_nodes[ID("default:desert_sand")] = ID("default:desert_sandstone")
-    list_nodes[ID("default:gravel")] = ID("default:stone")
+    set_falling_replace("default:sand", "default:sandstone")
+    set_falling_replace("default:silver_sand", "default:silver_sandstone")
+    set_falling_replace("default:desert_sand", "default:desert_sandstone")
+    set_falling_replace("default:gravel", "default:stone")
 end
 
 if minetest.get_modpath("ethereal") then
-    list_nodes[ID("ethereal:sandy")] = ID("default:sandstone")
+    set_falling_replace("ethereal:sandy", "default:sandstone")
 end
 
--- https://dev.minetest.net/Mapgen_memory_optimisations
-local data = {}
-
-local CONTENT_AIR = minetest.CONTENT_AIR
-minetest.register_on_generated(function(minp, maxp, blockseed)
-    local vm = get_mapgen_object("voxelmanip")
-    local vminp, vmaxp
-
-    -- Load at least one block below
-    do
-        local nminp = { x = minp.x, y = minp.y - 1, z = minp.z }
-        local nmaxp = { x = maxp.x, y = minp.y - 1, z = maxp.z }
-
-        vminp, vmaxp = vm:read_from_map(nminp, nmaxp)
-    end
-
-    local va = VoxelArea(vminp, vmaxp)
-    vm:get_data(data)
-
-    -- Iterate through generated blocks
-    for i in va:iterp(minp, maxp) do
-        local pos = va:position(i)
-        pos.y = pos.y - 1
-        local below = va:indexp(pos)
-
-        if data[below] == CONTENT_AIR then
-            local targ = list_nodes[data[i]]
-            if targ then
-                data[i] = targ
-            end
-        end
-    end
-
-    vm:set_data(data)
-
-    vm:write_to_map(true)
-end)
-
-fix_floating = {
-    list_nodes = list_nodes
-}
+minetest.register_mapgen_script(minetest.get_modpath("fix_floating") .. DIR_DELIM .. "mapgen.lua")
