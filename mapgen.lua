@@ -40,7 +40,6 @@ end
 local data = {}
 
 local CONTENT_AIR = minetest.CONTENT_AIR
-local get_mapgen_object = minetest.get_mapgen_object
 minetest.register_on_generated(function(vm, minp, maxp)
     init_data()
 
